@@ -38,10 +38,15 @@
     <script>
       const $ = (s,ctx=document)=>ctx.querySelector(s);
       const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
-      const API = (action, body) => fetch('api.php?action='+action, {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: body ? JSON.stringify(body) : null
-      }).then(r=>r.json());
+      const API_BASE =
+        (window.API_BASE || new URLSearchParams(location.search).get('api') || '').replace(/\/+$/,'');
+      const API = (action, body) =>
+        fetch(`${API_BASE ? API_BASE : ''}/api.php?action=` + action, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: body ? JSON.stringify(body) : null
+        }).then(r => r.json());
+
 
       const formatTime = (sec)=>{
         const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60;

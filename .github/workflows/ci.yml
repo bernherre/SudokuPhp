@@ -39,18 +39,16 @@ jobs:
 
       - name: Build static site for Pages
         env:
-          API_BASE_URL: ${{ vars.API_BASE_URL }}   # p.ej.: https://mi-dominio.com
+          API_BASE_URL: ${{ vars.API_BASE_URL }}   # p.ej. https://tu-dominio.com
         run: |
           mkdir -p dist
-          # Renderiza la UI a HTML estático
           php public/index.php > dist/index.html
-
-          # Copia assets no-PHP
           rsync -av --exclude='*.php' public/ dist/
 
-          # Reescribe llamadas a la API para usar tu backend PHP externo
+          # Inyecta window.API_BASE en el HTML (si definiste la variable del repo)
           if [ -n "$API_BASE_URL" ]; then
-            sed -i "s|fetch('api.php'|fetch('$API_BASE_URL/api.php'|g" dist/index.html
+            awk -v inj="<script>window.API_BASE='${API_BASE_URL}';</script>" \
+                '{print} /<head>/ && !x {print inj; x=1}' dist/index.html > dist/.tmp && mv dist/.tmp dist/index.html
           fi
 
       - name: Upload artifact (only once)

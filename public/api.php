@@ -6,6 +6,9 @@ use App\Sudoku;
 require __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: https://bernherre.github.io');
+header('Vary: Origin');
+
 
 $action = $_GET['action'] ?? 'new';
 $input = json_decode(file_get_contents('php://input') ?: "{}", true) ?? [];
