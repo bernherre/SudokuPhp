@@ -1,0 +1,24 @@
+{
+  "name": "bernardo/sudoku-php",
+  "description": "Sudoku 4x4/6x6/9x9 con PHP 8, API simple y UI ligera.",
+  "type": "project",
+  "require": {
+    "php": "^8.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "App\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit"
+  }
+}

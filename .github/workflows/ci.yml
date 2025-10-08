@@ -1,0 +1,61 @@
+﻿name: PHP → GitHub Pages (static UI + external API)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+      - name: Install deps
+        run: composer install --prefer-dist --no-interaction
+      - name: Run tests
+        run: vendor/bin/phpunit --display-warnings
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+
+      - name: Build static site for Pages
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}   # e.g. https://mi-dominio.com
+        run: |
+          mkdir -p dist
+          # Renderiza index.php a HTML estático
+          php public/index.php > dist/index.html
+          # Copia assets estáticos (excluye .php)
+          rsync -av --exclude='*.php' public/ dist/
+          # Reescribe las llamadas a la API para usar tu backend PHP externo
+          if [ -n "$API_BASE_URL" ]; then
+            sed -i "s|fetch('api.php'|fetch('$API_BASE_URL/api.php'|g" dist/index.html
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

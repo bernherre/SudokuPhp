@@ -1,0 +1,24 @@
+# Composer / PHP
+/vendor/
+composer.lock
+php_errors.log
+.env
+.env.*
+
+# PHPUnit
+.phpunit.result.cache
+/coverage/
+/cache/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (por si usas tooling front)
+node_modules/
+dist/
